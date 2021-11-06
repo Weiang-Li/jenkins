@@ -8,7 +8,7 @@ pipeline {
         SERVER_CREDENTIALS = credentials('server-credentials')
     }
     stages {
-        stage {
+        stage('init') {
             steps {
                 script {
                     gv = load "script.groovy"
