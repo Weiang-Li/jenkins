@@ -1,0 +1,33 @@
+pipeline {
+    agent any
+    
+    environment {
+        AWS_ACCESS_KEY_ID     = credentials('AWS_ACCESS_KEY_ID')
+        AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_ACCESS_KEY')
+        TF_IN_AUTOMATION      = '1'
+    }
+    
+    stages {
+        stage('checkout') {
+            steps {
+                echo "${AWS_ACCESS_KEY_ID}"
+                echo "${AWS_SECRET_ACCESS_KEY}"
+                checkout([$class: 'GitSCM', branches: [[name: '*/master']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/Weiang-Li/terraform']]])
+            }
+        }
+        stage('terraform init') {
+            steps {
+                sh "terraform init";
+            }
+        }
+        stage('terraform action') {
+            steps {
+                echo "terraform action from the parameter is --> ${action}"
+                echo "terraform ${action}  -var='access_key=${AWS_ACCESS_KEY_ID}' -var='secret_key=${AWS_SECRET_ACCESS_KEY}'"  
+                sh "terraform plan -var='access_key=${AWS_ACCESS_KEY_ID}' -var='secret_key=${AWS_SECRET_ACCESS_KEY}'" 
+
+                
+            }
+        }
+    }
+}
